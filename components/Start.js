@@ -1,18 +1,27 @@
 import { useState } from 'react';
-import { StyleSheet, View, Text, Button, TextInput, ImageBackground, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, View, Text, TextInput, ImageBackground, TouchableOpacity, Alert } from 'react-native';
+import { getAuth, signInAnonymously } from "firebase/auth";
 
-const Start = ({ navigation }) => {
-    const [name, setName] = useState('');
+const Start = ({ navigation, }) => {
+    const auth = getAuth();
+    const [username, setUsername] = useState('');
     const colors = ['#090C08', '#474056', '#8A95A5', '#B9C6AE'];
     const [background, setBackground] = useState(colors[0]);
 
-    const handleStartChat = () => {
-        if (name.trim()) {
-            navigation.navigate("Chat", { name: name, background: background });
-        } else {
-            Alert.alert('Please enter your name');
-        }
-    };
+    const signInUser = () => {
+        signInAnonymously(auth)
+          .then((result) => {
+            navigation.navigate("Chat", {
+              name: username,
+              background: background,
+              userID: result.user.uid,
+            });
+            Alert.alert("Signed in Successfully!");
+          })
+          .catch((error) => {
+            Alert.alert("Unable to sign in, try later again.");
+          });
+      };
 
     return (
         <View style={styles.container}>
@@ -20,13 +29,13 @@ const Start = ({ navigation }) => {
                 source={require("../assets/bgImage.png")}
                 style={styles.imageBackground}
             >
-                <Text style={styles.title}>ConnectoChat !</Text>
+                <Text style={styles.title}>Chat Master!</Text>
                 <View style={styles.box}>
                     {/* user types name */}
                     <TextInput
                         style={styles.textInput}
-                        value={name}
-                        onChangeText={setName}
+                        value={username}
+                        onChangeText={setUsername}
                         placeholder="Your name"
                     />
                     <Text style={styles.chooseBgColor}>Choose Background Color</Text>
@@ -42,7 +51,7 @@ const Start = ({ navigation }) => {
                     {/* to start chat */}
                     <TouchableOpacity
                         style={styles.button}
-                        onPress={handleStartChat}
+                        onPress={signInUser}
                     >
                         <Text style={styles.buttonText}>Start Chatting</Text>
                     </TouchableOpacity>
@@ -78,6 +87,8 @@ const styles = StyleSheet.create({
         height: '50%',
         alignItems: 'center',
         justifyContent: 'space-around',
+        paddingVertical: 20,
+        borderRadius: 10,
     },
     textInput: {
         width: '88%',
