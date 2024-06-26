@@ -24,7 +24,7 @@ const Start = ({ navigation, }) => {
       };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: background }]}>
             <ImageBackground
                 source={require("../assets/bgImage.png")}
                 style={styles.imageBackground}
